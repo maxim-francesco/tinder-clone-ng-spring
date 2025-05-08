@@ -1,0 +1,23 @@
+<div class="flex items-center justify-center flex-col">
+  <div class="flex space-between p-4">
+    <div class="text-4xl font-extrabold">tinder</div>
+    <div></div>
+  </div>
+  <div class="p-30">
+    <div class="text-center">
+      <h1 class="text-5xl font-extrabold">Swipe Right</h1>
+    </div>
+    <div class="flex flex-col space-y-5 pt-50">
+      <app-button
+        text="Create account"
+        [color]="false"
+        (click)="goToRegister()"
+      ></app-button>
+      <app-button
+        text="Log In"
+        [color]="true"
+        (click)="goToLogIn()"
+      ></app-button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+@if(showMain){
+<div class="p-30">
+  <div class="absolute left-0 top-3 text-3xl" (click)="toggleMain()"><-</div>
+  <div class="flex items-center justify-center flex-col">
+    <div class="flex flex-col text-center">
+      <h1 class="text-5xl font-extrabold">Get started</h1>
+      <h2 class="text-lg mt-5">
+        By tapping Log In or Continue, you agree to our Terms. Learn how we
+        process your data in our Privacy Policy and Cookie Policy
+      </h2>
+    </div>
+    <div class="flex flex-col space-y-5 pt-50">
+      <app-button text="Log in with Google" [color]="false"></app-button>
+      <app-button text="Log In with Facebook" [color]="true"></app-button>
+      <app-button
+        text="Log in with Email"
+        [color]="true"
+        (click)="toggleEmail()"
+      ></app-button>
+    </div>
+  </div>
+</div>
+} @if(showEmail){
+<div class="flex items-center justify-center p-10">
+  <div class="absolute left-0 top-3 text-3xl" (click)="toggleEmail()"><-</div>
+  <div class="flex items-center justify-center flex-col">
+    <div>
+      <h1 class="text-3xl font-extrabold">Can we get your email?</h1>
+    </div>
+    <div class="mt-5">
+      <input
+        type="text"
+        id="email"
+        [(ngModel)]="email"
+        class="border border-solid w-full p-2"
+      />
+    </div>
+    <div class="mt-20">
+      <app-button
+        text="Next"
+        [color]="false"
+        (click)="togglePassword()"
+      ></app-button>
+    </div>
+  </div>
+</div>
+} @if(showPassword){
+<div class="flex items-center justify-center p-10">
+  <div class="absolute left-0 top-3 text-3xl" (click)="togglePassword()">
+    <-
+  </div>
+  <div class="flex items-center justify-center flex-col">
+    <div>
+      <h1 class="text-3xl font-extrabold">Can you you enter your password?</h1>
+    </div>
+    <div class="mt-5">
+      <input
+        type="password"
+        id="password"
+        [(ngModel)]="password"
+        class="border border-solid w-full p-2"
+      />
+    </div>
+    <div class="mt-20">
+      <app-button
+        text="Next"
+        [color]="false"
+        (click)="toggleMainPage()"
+      ></app-button>
+    </div>
+  </div>
+</div>
+}
