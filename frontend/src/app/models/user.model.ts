@@ -1,9 +1,11 @@
-export interface User {
-  id?: string;
-  email?: string;
-  birth?: string;
-  name?: string;
-  gender?: string;
-  sexualOrientation: { [key: string]: boolean };
-  password?: string;
+export interface UserDTO {
+  id?: number;
+  email: string;
+  password: string;
+  // flattened profile fields from the backend UserDTO
+  profileName: string;
+  profileAge: number;
+  profileGender: string;
+  profileBio: string;
+  profileLocation: string;
 }

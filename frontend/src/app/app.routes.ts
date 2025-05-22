@@ -1,33 +1,20 @@
 import { Routes } from '@angular/router';
-import { MainComponent } from './components/auth/main/main.component';
-import { RegisterComponent } from './components/auth/register/register.component';
-import { LoginComponent } from './components/auth/login/login.component';
-import { FailedComponent } from './components/pages/failed/failed.component';
-import { MainPageComponent } from './components/pages/main-page/main-page.component';
+import { SwipeComponent } from './components/swipe/swipe.component';
+import { UserListComponent } from './components/user-list/user-list.component';
+import { MatchListComponent } from './components/match-list/match-list.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: MainComponent,
-  },
-  {
-    path: 'register',
-    component: RegisterComponent,
-  },
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'failed',
-    component: FailedComponent,
-  },
-  {
-    path: 'mainpage',
-    component: MainPageComponent,
-  },
-  {
-    path: '**',
-    component: MainComponent,
-  },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'swipe', component: SwipeComponent },
+  { path: 'users', component: UserListComponent },
+  { path: 'matches', component: MatchListComponent },
+  { path: 'chat/:matchId', component: ChatComponent },
+  { path: 'profile', component: ProfileComponent },
+  { path: '**', redirectTo: 'login' },
 ];

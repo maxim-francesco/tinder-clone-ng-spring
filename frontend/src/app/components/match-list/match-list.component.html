@@ -1,0 +1,79 @@
+<div class="matches-container">
+  <h1>Your Matches</h1>
+
+  <div class="alert error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="alert success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <div class="search-container">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Search matches by name..."
+      class="search-input"
+    />
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your matches...</p>
+  </div>
+
+  <div class="matches-list" *ngIf="!isLoading">
+    <div
+      class="match-item"
+      *ngFor="let matchItem of filteredMatches"
+      [routerLink]="['/chat', matchItem.match.id]"
+    >
+      <div class="match-avatar">
+        <img
+          [src]="
+            'https://randomuser.me/api/portraits/' +
+            (matchItem.user.profileGender === 'Female' ? 'women' : 'men') +
+            '/' +
+            ((matchItem.user.id || 0) % 100) +
+            '.jpg'
+          "
+          [alt]="matchItem.user.profileName"
+        />
+      </div>
+
+      <div class="match-details">
+        <div class="match-header">
+          <h3>{{ matchItem.user.profileName }}</h3>
+          <span class="time">{{ matchItem.lastMessageTime }}</span>
+        </div>
+        <p class="last-message">{{ matchItem.lastMessage }}</p>
+      </div>
+
+      <button
+        class="unmatch-btn"
+        (click)="$event.stopPropagation(); unmatch(matchItem.match.id)"
+        [disabled]="isDeletingMatch"
+      >
+        Unmatch
+      </button>
+    </div>
+
+    <div class="no-matches" *ngIf="filteredMatches.length === 0 && !isLoading">
+      <p *ngIf="searchTerm && allMatches.length > 0">
+        No matches found for "{{ searchTerm }}"
+      </p>
+      <p *ngIf="!searchTerm || allMatches.length === 0">
+        You don't have any matches yet. Start swiping to find matches!
+      </p>
+      <button
+        routerLink="/swipe"
+        class="start-swiping-btn"
+        *ngIf="!searchTerm || allMatches.length === 0"
+      >
+        Start Swiping
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="container">
+  <h1>Browse Users</h1>
+
+  <div class="user-grid">
+    <div class="user-card" *ngFor="let user of users">
+      <div class="user-image">
+        <img [src]="user.image" [alt]="user.name" />
+      </div>
+      <div class="user-info">
+        <h2>{{ user.name }}, {{ user.age }}</h2>
+        <p>{{ user.bio }}</p>
+      </div>
+      <div class="user-actions">
+        <button class="view-btn">View Profile</button>
+      </div>
+    </div>
+  </div>
+</div>

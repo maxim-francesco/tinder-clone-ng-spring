@@ -1,0 +1,122 @@
+<div class="profile-container">
+  <h1>Your Profile</h1>
+
+  <div class="alert error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="alert success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your profile...</p>
+  </div>
+
+  <div class="profile-content" *ngIf="user && !isLoading">
+    <div class="profile-header">
+      <div class="profile-image">
+        <!-- In a real app, you would handle profile image upload -->
+        <img
+          [src]="
+            'https://randomuser.me/api/portraits/' +
+            (user.profileGender === 'Female' ? 'women' : 'men') +
+            '/' +
+            ((user.id || 0) % 100) +
+            '.jpg'
+          "
+          [alt]="user.profileName"
+        />
+        <button class="change-photo-btn" *ngIf="isEditing">Change Photo</button>
+      </div>
+
+      <div class="profile-actions">
+        <button class="edit-btn" *ngIf="!isEditing" (click)="toggleEdit()">
+          Edit Profile
+        </button>
+        <div class="action-buttons" *ngIf="isEditing">
+          <button class="cancel-btn" (click)="toggleEdit()">Cancel</button>
+          <button
+            class="save-btn"
+            (click)="saveProfile()"
+            [disabled]="isSaving"
+          >
+            <span *ngIf="isSaving" class="spinner small"></span>
+            <span *ngIf="!isSaving">Save Changes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-form">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          [(ngModel)]="user.profileName"
+          [disabled]="!isEditing"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="user.email"
+          [disabled]="!isEditing"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input
+            type="number"
+            id="age"
+            [(ngModel)]="user.profileAge"
+            [disabled]="!isEditing"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select
+            id="gender"
+            [(ngModel)]="user.profileGender"
+            [disabled]="!isEditing"
+          >
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Non-binary">Non-binary</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input
+          type="text"
+          id="location"
+          [(ngModel)]="user.profileLocation"
+          [disabled]="!isEditing"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="bio">Bio</label>
+        <textarea
+          id="bio"
+          [(ngModel)]="user.profileBio"
+          [disabled]="!isEditing"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <!-- Note: Interests would require additional API endpoints and services -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+<div class="swipe-container">
+  <div class="alert error" *ngIf="errorMessage">
+    {{ errorMessage }}
+    <button class="dismiss-btn" (click)="errorMessage = null">Dismiss</button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading profiles...</p>
+  </div>
+
+  <div class="no-profiles" *ngIf="noMoreProfiles && !isLoading">
+    <h2>No more profiles</h2>
+    <p>You've seen all available profiles for now.</p>
+    <button class="refresh-btn" (click)="refreshProfiles()">
+      Refresh Profiles
+    </button>
+  </div>
+
+  <div
+    class="profile-card"
+    *ngIf="currentProfile && !isLoading && !noMoreProfiles"
+  >
+    <div class="profile-image">
+      <img
+        [src]="
+          'https://randomuser.me/api/portraits/' +
+          (currentProfile.profileGender === 'Female' ? 'women' : 'men') +
+          '/' +
+          ((currentProfile.id || 0) % 100) +
+          '.jpg'
+        "
+        [alt]="currentProfile.profileName"
+      />
+    </div>
+    <div class="profile-info">
+      <h2>{{ currentProfile.profileName }}, {{ currentProfile.profileAge }}</h2>
+      <p class="distance">{{ currentProfile.profileLocation }}</p>
+      <p class="bio">{{ currentProfile.profileBio }}</p>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        class="dislike-btn"
+        (click)="onDislike()"
+        [disabled]="isActionLoading"
+      >
+        <span class="material-icons">close</span>
+      </button>
+      <button
+        class="skip-btn"
+        (click)="skipProfile()"
+        [disabled]="isActionLoading"
+      >
+        <span class="material-icons">skip_next</span>
+      </button>
+      <button class="like-btn" (click)="onLike()" [disabled]="isActionLoading">
+        <span *ngIf="isActionLoading" class="spinner small white"></span>
+        <span *ngIf="!isActionLoading" class="material-icons">favorite</span>
+      </button>
+    </div>
+  </div>
+</div>

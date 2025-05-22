@@ -1,0 +1,30 @@
+<header class="header">
+  <div class="logo">
+    <a routerLink="/">TinderClone</a>
+  </div>
+  <nav class="nav">
+    <ul class="nav-list">
+      <!-- Show these navigation items only when logged in -->
+      <ng-container *ngIf="isLoggedIn()">
+        <li><a routerLink="/swipe" routerLinkActive="active">Home</a></li>
+        <li><a routerLink="/matches" routerLinkActive="active">Matches</a></li>
+        <li><a routerLink="/profile" routerLinkActive="active">Profile</a></li>
+        <li>
+          <a href="javascript:void(0)" (click)="logout()" class="logout"
+            >Logout</a
+          >
+        </li>
+      </ng-container>
+
+      <!-- Show these navigation items only when logged out -->
+      <ng-container *ngIf="!isLoggedIn()">
+        <li><a routerLink="/login" routerLinkActive="active">Log In</a></li>
+        <li>
+          <a routerLink="/register" routerLinkActive="active" class="signup"
+            >Sign Up</a
+          >
+        </li>
+      </ng-container>
+    </ul>
+  </nav>
+</header>

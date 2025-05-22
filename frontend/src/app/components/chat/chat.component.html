@@ -1,0 +1,91 @@
+<div class="chat-container">
+  <div class="alert error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoadingMatch">
+    <div class="spinner"></div>
+    <p>Loading chat...</p>
+  </div>
+
+  <ng-container *ngIf="!isLoadingMatch && matchedUser">
+    <div class="chat-header">
+      <div class="match-info">
+        <img
+          [src]="
+            'https://randomuser.me/api/portraits/' +
+            (matchedUser.profileGender === 'Female' ? 'women' : 'men') +
+            '/' +
+            ((matchedUser.id || 0) % 100) +
+            '.jpg'
+          "
+          [alt]="matchedUser.profileName"
+          class="match-avatar"
+        />
+        <div class="match-details">
+          <h2>{{ matchedUser.profileName }}</h2>
+          <p class="last-active">Online now</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="messages-container" #messagesContainer>
+      <div class="loading-messages" *ngIf="isLoadingMessages">
+        <div class="spinner"></div>
+        <p>Loading messages...</p>
+      </div>
+
+      <ng-container *ngIf="!isLoadingMessages">
+        <div class="no-messages" *ngIf="messages.length === 0">
+          <p>No messages yet. Say hello to {{ matchedUser.profileName }}!</p>
+        </div>
+
+        <ng-container *ngIf="messages.length > 0">
+          <!-- Group messages by date -->
+          <ng-container *ngFor="let message of messages; let i = index">
+            <div
+              class="message-date-separator"
+              *ngIf="
+                i === 0 ||
+                formatMessageDate(messages[i - 1].dateTime) !==
+                  formatMessageDate(message.dateTime)
+              "
+            >
+              <span>{{ formatMessageDate(message.dateTime) }}</span>
+            </div>
+
+            <div
+              class="message"
+              [class.outgoing]="isCurrentUserMessage(message)"
+              [class.incoming]="!isCurrentUserMessage(message)"
+            >
+              <div class="message-bubble">
+                {{ message.content }}
+              </div>
+              <div class="message-time">
+                {{ formatMessageTime(message.dateTime) }}
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div class="message-input">
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        placeholder="Type a message..."
+        (keyup.enter)="sendMessage()"
+        [disabled]="isSendingMessage"
+      />
+      <button
+        (click)="sendMessage()"
+        [disabled]="!newMessage.trim() || isSendingMessage"
+      >
+        <span *ngIf="isSendingMessage" class="spinner small white"></span>
+        <span *ngIf="!isSendingMessage">Send</span>
+      </button>
+    </div>
+  </ng-container>
+</div>

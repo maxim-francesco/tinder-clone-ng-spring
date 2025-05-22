@@ -1,0 +1,65 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fe3c72;
+  text-decoration: none;
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1.5rem;
+}
+
+.nav-list a {
+  text-decoration: none;
+  color: #424242;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-list a:hover,
+.nav-list a.active {
+  color: #fe3c72;
+}
+
+.logout {
+  color: #fe3c72 !important;
+}
+
+.signup {
+  background-color: #fe3c72;
+  color: white !important;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: background-color 0.2s !important;
+}
+
+.signup:hover {
+  background-color: #e62a5f;
+  color: white !important;
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .nav-list {
+    gap: 1rem;
+  }
+}
