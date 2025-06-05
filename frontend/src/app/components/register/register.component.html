@@ -1,11 +1,13 @@
 <div class="register-container">
   <h1>Create Account</h1>
 
+  <!-- Global error banner (e.g. password mismatch or server error) -->
   <div class="alert error" *ngIf="errorMessage">
     {{ errorMessage }}
   </div>
 
-  <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+  <form (ngSubmit)="onSubmit()" #registerForm="ngForm" novalidate>
+    <!-- Email -->
     <div class="form-group">
       <label for="email">Email</label>
       <input
@@ -16,15 +18,20 @@
         required
         email
         #email="ngModel"
+        [class.invalid]="email.invalid && (email.dirty || email.touched)"
       />
       <div
         class="error-message"
         *ngIf="email.invalid && (email.dirty || email.touched)"
       >
-        Please enter a valid email address.
+        <span *ngIf="email.errors?.['required']"> Email is required. </span>
+        <span *ngIf="email.errors?.['email']">
+          Please enter a valid email address.
+        </span>
       </div>
     </div>
 
+    <!-- Password -->
     <div class="form-group">
       <label for="password">Password</label>
       <input
@@ -35,15 +42,24 @@
         required
         minlength="6"
         #password="ngModel"
+        [class.invalid]="
+          password.invalid && (password.dirty || password.touched)
+        "
       />
       <div
         class="error-message"
         *ngIf="password.invalid && (password.dirty || password.touched)"
       >
-        Password must be at least 6 characters.
+        <span *ngIf="password.errors?.['required']">
+          Password is required.
+        </span>
+        <span *ngIf="password.errors?.['minlength']">
+          Password must be at least 6 characters.
+        </span>
       </div>
     </div>
 
+    <!-- Confirm Password -->
     <div class="form-group">
       <label for="confirmPassword">Confirm Password</label>
       <input
@@ -53,15 +69,34 @@
         [(ngModel)]="confirmPassword"
         required
         #confirmPasswordField="ngModel"
+        [class.invalid]="
+          (confirmPasswordField.invalid &&
+            (confirmPasswordField.dirty || confirmPasswordField.touched)) ||
+          (user.password !== confirmPassword && confirmPasswordField.dirty)
+        "
       />
       <div
         class="error-message"
-        *ngIf="user.password !== confirmPassword && confirmPasswordField.dirty"
+        *ngIf="
+          (confirmPasswordField.invalid &&
+            (confirmPasswordField.dirty || confirmPasswordField.touched)) ||
+          (user.password !== confirmPassword && confirmPasswordField.dirty)
+        "
       >
-        Passwords do not match.
+        <span *ngIf="confirmPasswordField.errors?.['required']">
+          Confirming your password is required.
+        </span>
+        <span
+          *ngIf="
+            !confirmPasswordField.errors && user.password !== confirmPassword
+          "
+        >
+          Passwords do not match.
+        </span>
       </div>
     </div>
 
+    <!-- Name -->
     <div class="form-group">
       <label for="name">Name</label>
       <input
@@ -70,16 +105,24 @@
         name="name"
         [(ngModel)]="user.profileName"
         required
-        #name="ngModel"
+        minlength="2"
+        #nameCtrl="ngModel"
+        [class.invalid]="
+          nameCtrl.invalid && (nameCtrl.dirty || nameCtrl.touched)
+        "
       />
       <div
         class="error-message"
-        *ngIf="name.invalid && (name.dirty || name.touched)"
+        *ngIf="nameCtrl.invalid && (nameCtrl.dirty || nameCtrl.touched)"
       >
-        Name is required.
+        <span *ngIf="nameCtrl.errors?.['required']"> Name is required. </span>
+        <span *ngIf="nameCtrl.errors?.['minlength']">
+          Name must be at least 2 characters.
+        </span>
       </div>
     </div>
 
+    <!-- Age -->
     <div class="form-group">
       <label for="age">Age</label>
       <input
@@ -89,16 +132,25 @@
         [(ngModel)]="user.profileAge"
         required
         min="18"
-        #age="ngModel"
+        max="120"
+        #ageCtrl="ngModel"
+        [class.invalid]="ageCtrl.invalid && (ageCtrl.dirty || ageCtrl.touched)"
       />
       <div
         class="error-message"
-        *ngIf="age.invalid && (age.dirty || age.touched)"
+        *ngIf="ageCtrl.invalid && (ageCtrl.dirty || ageCtrl.touched)"
       >
-        You must be at least 18 years old.
+        <span *ngIf="ageCtrl.errors?.['required']"> Age is required. </span>
+        <span *ngIf="ageCtrl.errors?.['min']">
+          You must be at least 18 years old.
+        </span>
+        <span *ngIf="ageCtrl.errors?.['max']">
+          Please enter a realistic age.
+        </span>
       </div>
     </div>
 
+    <!-- Gender -->
     <div class="form-group">
       <label for="gender">Gender</label>
       <select
@@ -106,7 +158,10 @@
         name="gender"
         [(ngModel)]="user.profileGender"
         required
-        #gender="ngModel"
+        #genderCtrl="ngModel"
+        [class.invalid]="
+          genderCtrl.invalid && (genderCtrl.dirty || genderCtrl.touched)
+        "
       >
         <option value="">Select gender</option>
         <option value="Male">Male</option>
@@ -116,12 +171,15 @@
       </select>
       <div
         class="error-message"
-        *ngIf="gender.invalid && (gender.dirty || gender.touched)"
+        *ngIf="genderCtrl.invalid && (genderCtrl.dirty || genderCtrl.touched)"
       >
-        Please select your gender.
+        <span *ngIf="genderCtrl.errors?.['required']">
+          Please select your gender.
+        </span>
       </div>
     </div>
 
+    <!-- Location -->
     <div class="form-group">
       <label for="location">Location</label>
       <input
@@ -130,27 +188,36 @@
         name="location"
         [(ngModel)]="user.profileLocation"
         required
-        #location="ngModel"
+        #locationCtrl="ngModel"
+        [class.invalid]="
+          locationCtrl.invalid && (locationCtrl.dirty || locationCtrl.touched)
+        "
       />
       <div
         class="error-message"
-        *ngIf="location.invalid && (location.dirty || location.touched)"
+        *ngIf="
+          locationCtrl.invalid && (locationCtrl.dirty || locationCtrl.touched)
+        "
       >
-        Location is required.
+        <span *ngIf="locationCtrl.errors?.['required']">
+          Location is required.
+        </span>
       </div>
     </div>
 
+    <!-- Bio (optional, no validation) -->
     <div class="form-group">
-      <label for="bio">Bio</label>
+      <label for="bio">Bio (optional)</label>
       <textarea
         id="bio"
         name="bio"
         [(ngModel)]="user.profileBio"
         rows="4"
-        #bio="ngModel"
+        #bioCtrl="ngModel"
       ></textarea>
     </div>
 
+    <!-- Submit Button -->
     <button
       type="submit"
       [disabled]="registerForm.invalid || isLoading"

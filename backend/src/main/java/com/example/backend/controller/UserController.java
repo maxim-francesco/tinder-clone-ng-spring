@@ -1,8 +1,7 @@
+// src/main/java/com/example/backend/controller/UserController.java
 package com.example.backend.controller;
 
 import com.example.backend.dto.UserDTO;
-import com.example.backend.exception.BadRequestException;
-import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.model.User;
 import com.example.backend.service.UserService;
@@ -21,62 +20,63 @@ public class UserController {
         this.userService = userService;
     }
 
-    /** GET /user/all → 200 OK + List<UserDTO> */
+    /**
+     * GET /user/all
+     * → 200 OK + JSON array of UserDTO (password = null inside each DTO)
+     */
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> dtos = userService.findAll().stream()
-                .map(UserMapper::toDto)
+        List<User> users = userService.findAll();
+
+        // Map each User → UserDTO, then null out the password in the DTO
+        List<UserDTO> dtos = users.stream()
+                .map(UserMapper::toDto)     // convert entity → DTO
+                .peek(dto -> dto.setPassword(null)) // ensure password is not exposed
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(dtos);
     }
 
-    /** GET /user/findbyid/{id} → 200 OK + UserDTO or 404 */
-    @GetMapping("/findbyid/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
-        User user = userService.findUserById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
-        return ResponseEntity.ok(UserMapper.toDto(user));
+    /**
+     * POST /user/signup
+     */
+    @PostMapping("/signup")
+    public ResponseEntity<UserDTO> signup(@RequestBody User payload) {
+        if (payload.getEmail() == null || payload.getPassword() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        User saved = userService.saveUser(payload);
+        UserDTO out = UserMapper.toDto(saved);
+        out.setPassword(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(out);
     }
 
-    /** GET /user/findbyemail/{email} → 200 OK + UserDTO or 404 */
-    @GetMapping("/findbyemail/{email}")
-    public ResponseEntity<UserDTO> findByEmail(@PathVariable String email) {
-        User user = userService.findUserByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
-        return ResponseEntity.ok(UserMapper.toDto(user));
-    }
-
-    /** POST /user/add → 201 Created + UserDTO or 400 */
-    @PostMapping("/add")
-    public ResponseEntity<UserDTO> add(@RequestBody UserDTO dto) {
-        if (dto.getEmail() == null || dto.getPassword() == null) {
-            throw new BadRequestException("Email and password must be provided");
+    /**
+     * POST /user/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        if (request.getEmail() == null || request.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Email and password must be provided");
         }
 
-        User toSave = UserMapper.toEntity(dto);
-        User saved = userService.saveUser(toSave);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(UserMapper.toDto(saved));
+        User user = userService.findByEmail(request.getEmail());
+        if (user == null || !userService.checkPassword(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
+        }
+
+        UserDTO out = UserMapper.toDto(user);
+        out.setPassword(null);
+        return ResponseEntity.ok(out);
     }
 
-    /** PUT /user/update/{id} → 200 OK + UserDTO or 404 */
-    @PutMapping("/update/{id}")
-    public ResponseEntity<UserDTO> update(
-            @PathVariable Long id,
-            @RequestBody UserDTO dto) {
-
-        // ensure user exists or 404
-        userService.findUserById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
-
-        // map DTO → entity and set ID
-        User toUpdate = UserMapper.toEntity(dto);
-        toUpdate.setId(id);
-
-        User updated = userService.update(id, toUpdate);
-        return ResponseEntity.ok(UserMapper.toDto(updated));
+    /** DTO used only for capturing login‐request fields */
+    public static class LoginRequest {
+        private String email;
+        private String password;
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
     }
-
-
 }

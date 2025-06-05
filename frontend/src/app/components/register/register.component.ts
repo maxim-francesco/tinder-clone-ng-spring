@@ -30,6 +30,7 @@ export class RegisterComponent {
   constructor(private userService: UserService, private router: Router) {}
 
   onSubmit(): void {
+    // Double-check matching passwords before sending to backend
     if (this.user.password !== this.confirmPassword) {
       this.errorMessage = 'Passwords do not match';
       return;
@@ -41,6 +42,7 @@ export class RegisterComponent {
     this.userService.register(this.user).subscribe({
       next: () => {
         this.isLoading = false;
+        // Navigate to “swipe” (home) after successful registration
         this.router.navigate(['/swipe']);
       },
       error: (error) => {

@@ -1,63 +1,45 @@
+// src/main/java/com/example/backend/service/UserService.java
 package com.example.backend.service;
 
-import com.example.backend.model.Profile;
 import com.example.backend.model.User;
-import com.example.backend.repository.ProfileRepository;
 import com.example.backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ProfileRepository profileRepository;
+    private final PasswordEncoder passwordEncoder; // bean injectat
 
-    @Autowired
-    public UserService(UserRepository userRepository, ProfileRepository profileRepository) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    /** Hash‐uiește parola și salvează user‐ul */
+    public User saveUser(User user) {
+        String hashed = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashed);
+        return userRepository.save(user);
+    }
+
+    /** Găsește user‐ul după email (sau null dacă nu există) */
+    public User findByEmail(String email) {
+        return userRepository.findUserByEmail(email).orElse(null);
+    }
+
+    /** Compară parola în clar cu hash‐ul stocat */
+    public boolean checkPassword(String raw, String hashed) {
+        return passwordEncoder.matches(raw, hashed);
+    }
+
+    // src/main/java/com/example/backend/service/UserService.java
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
-    }
-
-    public User update(Long id, User user) {
-        Optional<User> updatedUser = userRepository.findById(id);
-        if (updatedUser.isPresent()) {
-            updatedUser.get().setEmail(user.getEmail());
-            updatedUser.get().setPassword(user.getPassword());
-            Optional<Profile> updatedProfile = profileRepository.findById(user.getProfile().getId());
-            if (updatedProfile.isPresent()) {
-                updatedProfile.get().setAge(user.getProfile().getAge());
-                updatedProfile.get().setName(user.getProfile().getName());
-                updatedProfile.get().setGender(user.getProfile().getGender());
-                updatedProfile.get().setBio(user.getProfile().getBio());
-                updatedProfile.get().setLocation(updatedProfile.get().getLocation());
-                profileRepository.save(updatedProfile.get());
-            }
-            return userRepository.save(updatedUser.get());
-        }
-        return null;
-    }
-
-    public void deleteUser(User user) {
-        userRepository.delete(user);
-    }
 }

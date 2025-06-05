@@ -10,66 +10,80 @@ import { UserDTO } from '../models/user.model';
 export class UserService {
   private baseUrl = 'http://localhost:8080/user';
 
-  /** holds the current logged-in user (or null) purely in memory */
+  /** reține în memorie utilizatorul curent autentificat */
   private currentUserSubject = new BehaviorSubject<UserDTO | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  /** synchronous snapshot of current user */
+  /** instantaneu: cine este utilizatorul logat */
   get currentUserValue(): UserDTO | null {
     return this.currentUserSubject.value;
   }
 
-  /** update current user in memory */
+  /** actualizează utilizatorul logat în memorie */
   private setCurrentUser(user: UserDTO): void {
     this.currentUserSubject.next(user);
   }
 
-  /** clear current user */
+  /** dezautentifică utilizatorul */
   logout(): void {
     this.currentUserSubject.next(null);
   }
 
-  /** attempt login by fetching via email + checking password */
+  /**
+   * POST /user/login
+   * Trimite { email, password } la backend;
+   * dacă răspunde 200, stochează User-ul returnat în BehaviorSubject.
+   */
   login(email: string, password: string): Observable<UserDTO> {
-    return this.getUserByEmail(email).pipe(
-      tap((user) => {
-        if (user.password !== password) {
-          throw new Error('Invalid credentials');
-        }
-        this.setCurrentUser(user);
+    return this.http
+      .post<UserDTO>(`${this.baseUrl}/login`, { email, password })
+      .pipe(
+        tap((user) => {
+          // dacă login-ul e valid, setăm user-ul curent
+          this.setCurrentUser(user);
+        })
+      );
+  }
+
+  /**
+   * POST /user/signup
+   * Trimite un UserDTO (conținând email + password + câmpuri din profil) la backend.
+   * Dacă răspunde 201, stochează User-ul returnat în BehaviorSubject.
+   */
+  register(user: UserDTO): Observable<UserDTO> {
+    return this.http.post<UserDTO>(`${this.baseUrl}/signup`, user).pipe(
+      tap((created) => {
+        // după înregistrare, considerăm user-ul autentificat
+        this.setCurrentUser(created);
       })
     );
   }
 
-  /** wrap register endpoint */
-  register(user: UserDTO): Observable<UserDTO> {
-    return this.http
-      .post<UserDTO>(`${this.baseUrl}/add`, user)
-      .pipe(tap((created) => this.setCurrentUser(created)));
-  }
-
-  /** fetch all users */
+  /** GET /user/all */
   getAllUsers(): Observable<UserDTO[]> {
     return this.http.get<UserDTO[]>(`${this.baseUrl}/all`);
   }
 
-  /** fetch by id */
+  /** GET /user/findbyid/{id} */
   getUserById(id: number): Observable<UserDTO> {
     return this.http.get<UserDTO>(`${this.baseUrl}/findbyid/${id}`);
   }
 
-  /** fetch by email */
+  /** GET /user/findbyemail/{email} */
   getUserByEmail(email: string): Observable<UserDTO> {
     return this.http.get<UserDTO>(`${this.baseUrl}/findbyemail/${email}`);
   }
 
-  /** update profile */
+  /**
+   * PUT /user/update/{id}
+   * Actualizează datele de profil ale unui user.
+   * Dacă id-ul corespunde utilizatorului logat, actualizează și BehaviorSubject-ul.
+   */
   updateUser(id: number, user: UserDTO): Observable<UserDTO> {
     return this.http.put<UserDTO>(`${this.baseUrl}/update/${id}`, user).pipe(
       tap((updated) => {
-        // if the currently logged-in user updated themself, refresh
         if (this.currentUserValue?.id === updated.id) {
           this.setCurrentUser(updated);
         }

@@ -12,12 +12,13 @@ public class UserMapper {
         u.setEmail(dto.getEmail());
         u.setPassword(dto.getPassword());
 
-        Profile p = new Profile();
-        p.setName(dto.getProfileName());
-        p.setAge(dto.getProfileAge());
-        p.setGender(dto.getProfileGender());
-        p.setBio(dto.getProfileBio());
-        p.setLocation(dto.getProfileLocation());
+        Profile p = new Profile.Builder()
+                .name(dto.getProfileName())
+                .age(dto.getProfileAge())
+                .gender(dto.getProfileGender())
+                .bio(dto.getProfileBio())
+                .location(dto.getProfileLocation())
+                .build();
 
         u.setProfile(p);
         return u;
@@ -27,7 +28,7 @@ public class UserMapper {
         UserDTO dto = new UserDTO();
         dto.setId(u.getId());
         dto.setEmail(u.getEmail());
-        // nu expune parola dacă nu vrei: dto.setPassword(null);
+        // If you don’t want to expose the hash, you can set password to null here:
         dto.setPassword(u.getPassword());
 
         Profile p = u.getProfile();
@@ -41,4 +42,3 @@ public class UserMapper {
         return dto;
     }
 }
-
